@@ -74,6 +74,7 @@ export class StrudelService {
       import('@strudel/core'),
       import('@strudel/mini'),
       import('@strudel/webaudio'),
+      import('@strudel/tonal'),
     )
 
     this.replInstance = createRepl({

@@ -113,11 +113,11 @@ function fmtTime(s: number) {
 
 const _ICON: Record<string, string> = {
 
-  play_audio: 'ðŸ”ˆ',
+  play_audio: 'ðŸ"ˆ',
 
   open_app:   '🚀',
 
-  run_script: 'ðŸ“œ',
+  run_script: 'ðŸ"œ',
 
 }
 
@@ -300,7 +300,7 @@ function AppInner() {
 
 
 
-  // Coalesce updates de timeupdate em buckets de animation-frame â€”
+  // Coalesce updates de timeupdate em buckets de animation-frame â€"
 
   // mÃºltiplos decks tocando juntos = 1 setState por frame, nÃ£o N.
 
@@ -383,7 +383,7 @@ function AppInner() {
 
 
 
-  // Persist visibilidade â€” 1 useEffect por chave evita 11 setItem por toggle.
+  // Persist visibilidade â€" 1 useEffect por chave evita 11 setItem por toggle.
 
   useEffect(() => { localStorage.setItem('panel-keys', String(showKeys)) }, [showKeys])
   useEffect(() => { localStorage.setItem('keys-vertical', String(verticalKeys)) }, [verticalKeys])
@@ -429,7 +429,7 @@ function AppInner() {
 
 
 
-  /* â”€â”€ Physical keyboard bridge: long-poll Flask, pausa em background â”€â”€ */
+  /* â"€â"€ Physical keyboard bridge: long-poll Flask, pausa em background â"€â"€ */
 
   useEffect(() => {
 
@@ -509,7 +509,7 @@ function AppInner() {
 
 
 
-  /* â”€â”€ Ctrl+K palette â”€â”€ */
+  /* â"€â"€ Ctrl+K palette â"€â"€ */
 
   useEffect(() => {
 
@@ -945,7 +945,7 @@ function AppInner() {
 
 
 
-  /* â”€â”€ Figma-like cursors â”€â”€ */
+  /* â"€â"€ Figma-like cursors â"€â"€ */
 
   useEffect(() => {
 
@@ -991,7 +991,7 @@ function AppInner() {
 
 
 
-  /* â”€â”€ Adaptive wheel: zoom-aware speed, burst detection, gentle inertia â”€â”€ */
+  /* â"€â"€ Adaptive wheel: zoom-aware speed, burst detection, gentle inertia â"€â"€ */
 
   const canvasRef = useRef<HTMLElement>(null)
 
@@ -1075,35 +1075,17 @@ function AppInner() {
 
 
 
-    const canScrollInside = (target: HTMLElement, dy: number, dx: number): boolean => {
-      let node: HTMLElement | null = target
-      const boundary = target.closest?.('.panel-drag')
-      if (!boundary) return false
-      while (node && node !== boundary) {
-        const { overflowY, overflowX } = getComputedStyle(node)
-        const scrollableY = overflowY === 'auto' || overflowY === 'scroll'
-        const scrollableX = overflowX === 'auto' || overflowX === 'scroll'
-        if (scrollableY && dy !== 0) {
-          const atTop = node.scrollTop <= 0 && dy < 0
-          const atBottom = node.scrollTop + node.clientHeight >= node.scrollHeight - 1 && dy > 0
-          if (!atTop && !atBottom) return true
-        }
-        if (scrollableX && dx !== 0) {
-          const atLeft = node.scrollLeft <= 0 && dx < 0
-          const atRight = node.scrollLeft + node.clientWidth >= node.scrollWidth - 1 && dx > 0
-          if (!atLeft && !atRight) return true
-        }
-        node = node.parentElement
-      }
-      return false
-    }
-
     const handleCanvasWheel = (e: WheelEvent) => {
 
       if (!transformRef.current) return
 
       const target = e.target as HTMLElement
-      if (canScrollInside(target, e.deltaY, e.deltaX)) return
+      const isZoom = e.ctrlKey || e.metaKey
+      // Plain scroll over a panel belongs to that panel — its own scroll areas,
+      // knobs, sliders and chat. But Ctrl/Cmd+scroll always zooms the canvas,
+      // even over a panel, so we keep it (and preventDefault below stops the
+      // browser's native page zoom).
+      if (!isZoom && target.closest?.('.panel-drag')) return
 
       e.preventDefault()
       e.stopPropagation()
@@ -1112,7 +1094,7 @@ function AppInner() {
       const { positionX, positionY, scale: currentScale } = state
 
       // Ctrl/Cmd+scroll = zoom toward mouse
-      if (e.ctrlKey || e.metaKey) {
+      if (isZoom) {
         cancelAnimationFrame(inertiaRef.current)
         velRef.current = { x: 0, y: 0 }
 
@@ -1283,16 +1265,16 @@ function AppInner() {
         {/* Create folder button */}
         <button
           onClick={createFolder}
-          title=”Create Folder”
-          aria-label=”Create folder”
-          className=”w-10 h-6 flex items-center justify-center cursor-pointer border border-dashed border-white/10 hover:border-white/30 transition-all rounded-lg”
+          title="Create Folder"
+          aria-label="Create folder"
+          className="w-10 h-6 flex items-center justify-center cursor-pointer border border-dashed border-white/10 hover:border-white/30 transition-all rounded-lg"
           style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, gap: 2 }}
         >
           <span style={{ fontSize: 13, lineHeight: 1 }}>+</span>
           <span style={{ fontSize: 9 }}>📁</span>
         </button>
 
-        <div className=”mt-auto” />
+        <div className="mt-auto" />
 
         {/* Online status */}
 
@@ -1360,7 +1342,7 @@ function AppInner() {
 
             <>
 
-              {/* Background instructions hint â€” fades out after 3s */}
+              {/* Background instructions hint â€" fades out after 3s */}
 
               <div className="fixed top-20 left-1/2 -translate-x-1/2 z-0 pointer-events-none flex gap-8 text-[10px] font-black uppercase tracking-[0.3em] canvas-hint">
 
@@ -1398,7 +1380,7 @@ function AppInner() {
 
 
 
-              {/* Mixer mini â€” fixed outside canvas */}
+              {/* Mixer mini â€" fixed outside canvas */}
 
               {showMixer && mixerMinimized && (
 
@@ -1778,7 +1760,7 @@ const action = config.buttons?.[key] || {} as any
 
 
 
-        {/* Mixer panel â€” full mode inside canvas */}
+        {/* Mixer panel â€" full mode inside canvas */}
 
         {showMixer && !mixerMinimized && (
 
@@ -1914,7 +1896,7 @@ const action = config.buttons?.[key] || {} as any
 
 
 
-        {/* Floating preset button â€” fixed bottom-right, outside canvas scale */}
+        {/* Floating preset button â€" fixed bottom-right, outside canvas scale */}
 
         <PresetFloating
 

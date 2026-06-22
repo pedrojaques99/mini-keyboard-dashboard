@@ -55,10 +55,15 @@
             "path": "Z:\\Cursor\\7panel_studio\\backend\\assets\\puta-mano.mp3",
             "type": "play_audio"
         },
+        "key_f21": {
+            "label": "j®",
+            "path": "Z:\\Cursor\\7panel_studio\\jaques.vbs",
+            "type": "play_audio"
+        },
         "key_f22": {
             "args": "",
-            "label": "",
-            "path": "",
+            "label": "jaques.vbs",
+            "path": "\"Z:\\Cursor\\7panel_studio\\jaques.vbs\"",
             "type": "play_audio"
         },
         "key_f23": {
@@ -72,11 +77,6 @@
             "label": "Ambient Test",
             "path": "https://www.youtube.com/watch?v=TkQ-S0nvcGg",
             "type": "play_audio"
-        },
-        "key_f21": {
-            "type": "play_audio",
-            "label": "foguete",
-            "path": "Z:\\jaques.dsgn\\sfx_music\\foguete.mp3"
         }
     },
     "commands": {

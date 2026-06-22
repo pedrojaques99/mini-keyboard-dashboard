@@ -136,7 +136,7 @@ export function AnalogBrainPanel({ onClose }: { onClose: () => void }) {
 
   const [initMsgId] = useState(() => { const m: Message[] = loadJson('messages', []); return m.length ? Math.max(...m.map(x => x.id)) : 0 })
   const msgIdRef = useRef(initMsgId)
-  const chatEndRef = useRef<HTMLDivElement>(null)
+  const chatScrollRef = useRef<HTMLDivElement>(null)
   const serviceRef = useRef<StrudelService | null>(null)
   const chatHistoryRef = useRef<ChatMessage[]>(loadJson('chatHistory', []))
 
@@ -154,7 +154,12 @@ export function AnalogBrainPanel({ onClose }: { onClose: () => void }) {
     return () => { unsub() }
   }, [])
 
-  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
+  // Scroll only the chat container — NOT scrollIntoView, which walks up and
+  // scrolls every scrollable ancestor (including the canvas pan) into view.
+  useEffect(() => {
+    const el = chatScrollRef.current
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+  }, [messages])
   useEffect(() => { serviceRef.current?.setVolume(volume) }, [volume])
 
   // ── Persist state ──
@@ -507,7 +512,6 @@ export function AnalogBrainPanel({ onClose }: { onClose: () => void }) {
     <CaptureIdContext.Provider value={PANEL_ID}>
       <Rnd {...rndProps}>
         <div
-          onWheel={e => e.stopPropagation()}
           onKeyDown={e => e.stopPropagation()}
           onKeyUp={e => e.stopPropagation()}
           style={{
@@ -618,7 +622,7 @@ export function AnalogBrainPanel({ onClose }: { onClose: () => void }) {
 
             {/* ── Right: Chat Terminal ── */}
             <div style={{ flex: '1 1 45%', display: 'flex', flexDirection: 'column', minWidth: 0, background: 'rgba(0,0,0,0.2)' }}>
-              <div onWheel={e => e.stopPropagation()} style={{ flex: 1, overflow: 'auto', padding: '12px 14px', fontFamily: 'monospace', fontSize: 12, lineHeight: 1.6, minHeight: 200 }}>
+              <div ref={chatScrollRef} style={{ flex: 1, overflow: 'auto', padding: '12px 14px', fontFamily: 'monospace', fontSize: 12, lineHeight: 1.6, minHeight: 200 }}>
                 {messages.length === 0 && (
                   <div style={{ padding: '16px 0' }}>
                     <div style={{ color: PHOSPHOR, marginBottom: 8, fontSize: 11 }}>{'> ANALOG BRAIN mk.II ready'}</div>
@@ -642,7 +646,6 @@ export function AnalogBrainPanel({ onClose }: { onClose: () => void }) {
                 {thinking && (
                   <div style={{ color: AMBER, animation: 'pulse 1.5s infinite' }}>{'< '}thinking...</div>
                 )}
-                <div ref={chatEndRef} />
               </div>
 
               {/* Input */}
